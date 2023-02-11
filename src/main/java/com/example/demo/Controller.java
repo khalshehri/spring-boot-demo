@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -28,20 +29,11 @@ public class Controller {
     @GetMapping("/api/download")
     public HttpEntity<byte[]> download() throws Exception {
 
-        File file = ResourceUtils.getFile("classpath:test.pdf");
 
-        FileInputStream fl = new FileInputStream(file);
+        ClassPathResource file = new ClassPathResource("test.pdf");
 
         // Now creating byte array of same length as file
-        byte[] arr = new byte[(int)file.length()];
-
-        // Reading file content to byte array
-        // using standard read() method
-        fl.read(arr);
-
-        // lastly closing an instance of file input stream
-        // to avoid memory leakage
-        fl.close();
+        byte[] arr = file.getInputStream().readAllBytes();
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.APPLICATION_PDF);
