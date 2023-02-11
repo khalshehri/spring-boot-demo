@@ -1,8 +1,16 @@
 package com.example.demo;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 @RestController
 public class Controller {
@@ -15,6 +23,35 @@ public class Controller {
     @GetMapping
     public ResponseEntity test2(){
         return ResponseEntity.ok("Home");
+    }
+
+    @GetMapping("/api/download")
+    public HttpEntity<byte[]> download() throws Exception {
+
+        File file = ResourceUtils.getFile("classpath:test.pdf");
+
+        FileInputStream fl = new FileInputStream(file);
+
+        // Now creating byte array of same length as file
+        byte[] arr = new byte[(int)file.length()];
+
+        // Reading file content to byte array
+        // using standard read() method
+        fl.read(arr);
+
+        // lastly closing an instance of file input stream
+        // to avoid memory leakage
+        fl.close();
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.APPLICATION_PDF);
+        header.set(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=test.pdf");
+        header.setContentLength(arr.length);
+
+        return new HttpEntity<byte[]>(arr, header);
+
+
     }
 
 }
